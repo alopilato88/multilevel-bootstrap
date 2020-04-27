@@ -27,8 +27,19 @@ simMLMMediation <- function(
   
   ##### Define objects that are used across all mediation models ##### 
   # Turn model parameter vectors into matrices
-  userBx <- as.matrix(c(INT = 0, model.one.fixed.effect))
-  userBm <- as.matrix(c(INT = 0, model.two.fixed.effect))
+  userBx <- as.matrix(
+    c(
+      INT = 0, 
+      model.one.fixed.effect
+      )
+    )
+  
+  userBm <- as.matrix(
+    c(
+      INT = 0, 
+      model.two.fixed.effect
+      )
+    )
   
   ##### Create random-effects design matrix for models 1 and 2: Z
   clusters <- rep(
@@ -45,30 +56,32 @@ simMLMMediation <- function(
     
     # Check to see if correct effects have been provided 
     betaXCheck <- sum(
-      c("M.X", "M.X_MEAN") %in% names(model.one.fixed.effect)
+      c("M.X") %in% names(model.one.fixed.effect)
     )
     
     betaMCheck <- sum(
       c("Y.M_CLUSTER_MEAN", "Y.M_CWC") %in% names(model.two.fixed.effect)
     )
     
-    if(betaXCheck == 0) {
+    if(betaXCheck != 1) {
       stop("User has not provided the correct model one parameter names.")
     }
     
-    if(betaMCheck < 2) {
+    if(betaMCheck != 2) {
       stop("User has not provided the correct model two parameter names.")
     }
     
     # Create X and M fixed-effect (beta) matrices
-    Bx <- as.matrix(rep(0, nrow(userBx)),
-                    nrow = nrow(userBx),
-                    ncol = 1
+    Bx <- as.matrix(
+      rep(0, nrow(userBx)),
+      nrow = nrow(userBx),
+      ncol = 1
     )
     
-    Bm <- as.matrix(rep(0, nrow(userBm)),
-                    nrow = nrow(userBm),
-                    ncol = 1
+    Bm <- as.matrix(
+      rep(0, nrow(userBm)),
+      nrow = nrow(userBm),
+      ncol = 1
     )
     
     # Organize the Bx and Bm matrices so we can identify the fixed-effects
@@ -82,7 +95,7 @@ simMLMMediation <- function(
     
     ##### Generate model 1 M ~ X #####
     # Randomly generate X variables from a multivariate normal dist. 
-    X <- rnorm(
+    x <- rnorm(
       n = number.clusters,
       mean = 0,
       sd = 1
@@ -90,10 +103,13 @@ simMLMMediation <- function(
     
     # Repeat the X matrix so that each unit in a cluster recieves the same 
     # X value
-    X <- rep(X, each = (total.sample.size / number.clusters))
+    x <- rep(
+      x, 
+      each = (total.sample.size / number.clusters)
+    )
     
     # Add column vector of 1s for the intercept term
-    X <- cbind(1, X)
+    X <- cbind(1, x)
     
     # Create fixed f(x) 
     xPred <- X%*%Bx
@@ -118,7 +134,7 @@ simMLMMediation <- function(
     }
     
     # Conditional ICC for mediator -- ICC after controlling for X
-    iccM <- conditional.icc[1]
+    iccM <- conditional.icc["ICC_M"]
     
     # Variable replacement to make the equations easier to work with
     z <- (1 - iccM) / iccM
@@ -181,7 +197,7 @@ simMLMMediation <- function(
     }
     
     # Conditional ICC for y -- ICC after controlling for mediator effects
-    iccY <- conditional.icc[2]
+    iccY <- conditional.icc["ICC_Y"]
     
     # Variable replacement to make the equations easier to work with
     z <- (1 - iccY) / iccY
@@ -215,7 +231,7 @@ simMLMMediation <- function(
       data.frame(
         Y = y, 
         M = m,
-        M_CLUST_MEAN = mClusterMean,
+        M_CLUSTER_MEAN = mClusterMean,
         M_CWC = mCWC, 
         X = X[, 2],
         CLUSTER = clusters
@@ -245,14 +261,16 @@ simMLMMediation <- function(
     }
     
     # Create X and M fixed-effect (beta) matrices
-    Bx <- as.matrix(rep(0, nrow(userBx)),
-                    nrow = nrow(userBx),
-                    ncol = 1
+    Bx <- as.matrix(
+      rep(0, nrow(userBx)),
+      nrow = nrow(userBx),
+      ncol = 1
     )
     
-    Bm <- as.matrix(rep(0, nrow(userBm)),
-                    nrow = nrow(userBm),
-                    ncol = 1
+    Bm <- as.matrix(
+      rep(0, nrow(userBm)),
+      nrow = nrow(userBm),
+      ncol = 1
     )
     
     # Organize the Bx and Bm matrices so we can identify the fixed-effects
@@ -326,7 +344,11 @@ simMLMMediation <- function(
     
     xCWC <- x - xClusterMean
     
-    X <- cbind(1, xClusterMean, xCWC)
+    X <- cbind(
+      1, 
+      xClusterMean, 
+      xCWC
+      )
     
     # Create fixed f(x) 
     xPred <- X%*%Bx
@@ -448,10 +470,10 @@ simMLMMediation <- function(
       data.frame(
         Y = y, 
         M = m,
-        M_CLUST_MEAN = mClusterMean,
+        M_CLUSTER_MEAN = mClusterMean,
         M_CWC = mCWC, 
         X = x,
-        X_CLUST_MEAN = xClusterMean,
+        X_CLUSTER_MEAN = xClusterMean,
         X_CWC = xCWC,
         CLUSTER = clusters
       ) 
@@ -480,14 +502,16 @@ simMLMMediation <- function(
     }
     
     # Create X and M fixed-effect (beta) matrices
-    Bx <- as.matrix(rep(0, nrow(userBx)),
-                    nrow = nrow(userBx),
-                    ncol = 1
+    Bx <- as.matrix(
+      rep(0, nrow(userBx)),
+      nrow = nrow(userBx),
+      ncol = 1
     )
     
-    Bm <- as.matrix(rep(0, nrow(userBm)),
-                    nrow = nrow(userBm),
-                    ncol = 1
+    Bm <- as.matrix(
+      rep(0, nrow(userBm)),
+      nrow = nrow(userBm),
+      ncol = 1
     )
     
     # Organize the Bx and Bm matrices so we can identify the fixed-effects
@@ -558,12 +582,12 @@ simMLMMediation <- function(
       stop("The user has provided too many conditional ICCs.")
     }
     
-    if(!("ICC_M" %in% names(conditional.icc))) {
+    if(!("ICC_Y" %in% names(conditional.icc))) {
       stop("The user has not correctly named the conditional ICC.")
     }
     
     # Conditional ICC for y -- ICC after controlling for mediator effects
-    iccY <- conditional.icc
+    iccY <- conditional.icc["ICC_Y"]
     
     # Variable replacement to make the equations easier to work with
     z <- (1 - iccY) / iccY

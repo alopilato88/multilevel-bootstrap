@@ -9,7 +9,7 @@ simMLMMediation <- function(
   number.clusters = 200,
   model.one.fixed.effect = c(M.X = .40), 
   model.two.fixed.effect = c(Y.M_CLUSTER_MEAN = .14, Y.M_CWC = -.39),
-  conditional.icc = c(.17, .17)
+  conditional.icc = c(ICC_M = .17, ICC_Y = .17)
 ) {
   
   # Check if the user specified one of the three correct mlm.mediation.model
@@ -107,6 +107,14 @@ simMLMMediation <- function(
     
     if(mUnexpVar <= 0) {
       stop("The fixed-effects of X are too large.")
+    }
+    
+    # Check to see if the script can identify the correct ICCs (ICC_M & ICC_Y)
+    iccCheck <- 
+      sum(c("ICC_M", "ICC_Y") %in% names(conditional.icc))
+    
+    if(iccCheck != 2) {
+      stop("The user has not correctly named the conditional ICCs.")
     }
     
     # Conditional ICC for mediator -- ICC after controlling for X
@@ -308,6 +316,15 @@ simMLMMediation <- function(
     
     if(yUnexpVar <= 0) {
       stop("The fixed-effects for the mediator variables are too large.")
+    }
+    
+    # Check to see if the script can identify the correct ICCs (ICC_M & ICC_Y)
+    if(length(conditional.icc) > 1) {
+      stop("The user has provided too many conditional ICCs.")
+    }
+    
+    if(!("ICC_M" %in% names(conditional.icc))) {
+      stop("The user has not correctly named the conditional ICC.")
     }
     
     # Conditional ICC for y -- ICC after controlling for mediator effects

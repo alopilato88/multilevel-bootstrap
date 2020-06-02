@@ -60,6 +60,32 @@ data111 <-
 m1_111 <- lmer(M ~ X_CLUSTER_MEAN + X_CWC + (1|CLUSTER), data111)
 m2_111 <- lmer(Y ~ M_CLUSTER_MEAN + M_CWC + (1|CLUSTER), data111)
 
+indirectEffect <- function(
+  m1Formula,
+  m2Formula,
+  data,
+  iv,
+  med
+) {
+  
+  m1 <- lme4::lmer(m1Formula, data = data)
+  m2 <- lme4::lmer(m2Formula, data = data)
+
+  m1Summary <- summary(m1)
+  m2Summary <- summary(m2)
+  
+  ivCoef <- m1Summary$coefficients[
+    which(rownames(m1Summary$coefficients) == iv), "Estimate"]
+  
+  medCoef <- m2Summary$coefficients[
+    which(rownames(m2Summary$coefficients) == med), "Estimate"]
+  
+  return(ivCoef * medCoef)
+  
+}
+
+m1Formula <- as.formula(M ~ X_CLUSTER_MEAN + X_CWC + (1|CLUSTER))
+m2Formula <- as.formula(Y ~ M_CLUSTER_MEAN + M_CWC + (1|CLUSTER))
 
 
 
